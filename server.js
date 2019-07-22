@@ -1,0 +1,51 @@
+// server.js
+// This is where your node app starts
+const cors = require("cors");
+//load the 'express' module which makes writing webservers easy
+const express = require("express");
+const app = express();
+app.use(cors);
+
+//load the quotes JSON
+const Quotes = require("./quotes.json");
+app.get("/quotes", (req, res) => {
+  res.send(Quotes);
+});
+app.get("/quotes/random", (req, res) => {
+  res.send(pickFromArray(Quotes));
+});
+app.get("/quotes/search", (req, res) => {
+  if(req.query.word=== undefined&& req.query.authorName===undefined){
+  res.send("Result not found")
+  }else{
+  var findAuthor= Quotes.filter(name=>name.author.toLowerCase().includes(req.query.authorName.toLowerCase()));
+  var findQuotes = findAuthor.filter(
+    item =>
+      item.quote.toLowerCase().includes(req.query.word.toLowerCase()) 
+  );
+  res.send(findQuotes);
+}});
+// Now register handlers for some routes:
+//   /                  - Return some helpful welcome info (text)
+//   /quotes            - Should return all quotes (json)
+//   /quotes/random     - Should return ONE" quote (json)
+app.get("/", function(request, response) {
+  response.send("Neill's Quote Server!  Ask me for /quotes/random, or /quotes");
+});
+
+//START OF YOUR CODE...
+
+//...END OF YOUR CODE
+
+//You can use this function to pick one element at random from a given array
+//example: pickFromArray([1,2,3,4]), or
+//example: pickFromArray(myContactsArray)
+//
+function pickFromArray(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+//Start our server so that it listens for HTTP requests!
+const listener = app.listen(process.env.PORT || 3002, function() {
+  console.log("Your app is listening on port " + listener.address().port);
+});
